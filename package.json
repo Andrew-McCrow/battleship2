@@ -1,0 +1,37 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "template",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "webpack serve --open --mode development",
+    "build": "webpack --mode production",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write 'src/**/*.{js,mjs,cjs}' '*.cjs'",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "template",
+    "landing-page",
+    "webpack"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "css-loader": "^7.1.2",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "globals": "^17.2.0",
+    "html-loader": "^5.1.0",
+    "html-webpack-plugin": "^5.6.6",
+    "prettier": "^3.8.1",
+    "style-loader": "^4.0.0",
+    "webpack": "^5.104.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.3"
+  }
+}
