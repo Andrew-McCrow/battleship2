@@ -4,7 +4,7 @@ import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
 
 export default [
-  { ignores: ['dist/**', 'node_modules/**'] },
+  { ignores: ['dist/**', 'node_modules/**', 'babel.config.js'] },
 
   // Base ESLint recommended rules
   js.configs.recommended,
