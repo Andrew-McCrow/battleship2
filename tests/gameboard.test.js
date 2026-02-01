@@ -1,4 +1,4 @@
-import Gameboard from '../src/gameboard.js';
+import Gameboard from '../src/models/gameboard.js';
 
 describe('Gameboard', () => {
 	describe('placeShip()', () => {

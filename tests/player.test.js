@@ -1,5 +1,5 @@
-import Player from '../src/player.js';
-import Gameboard from '../src/gameboard.js';
+import Player from '../src/models/player.js';
+import Gameboard from '../src/models/gameboard.js';
 
 describe('Player', () => {
   it('creates a real player with a gameboard by default', () => {
