@@ -1,4 +1,5 @@
 import Player from '../models/player.js';
+import Game from '../game.js';
 
 const DOM = (() => {
   // Create the main game container div
@@ -90,7 +91,8 @@ const DOM = (() => {
 
     const realBoard = boardElement('real');
     realBoard.appendChild(playerDisplay('Real'));
-    realBoard.appendChild(renderBoard(realPlayer.gameboard));
+    const realGrid = renderBoard(realPlayer.gameboard);
+    realBoard.appendChild(realGrid);
     container.appendChild(realBoard);
 
     // Create computer player
@@ -104,12 +106,96 @@ const DOM = (() => {
 
     const computerBoard = boardElement('computer');
     computerBoard.appendChild(playerDisplay('Computer'));
-    computerBoard.appendChild(renderBoard(computerPlayer.gameboard));
+    const computerGrid = renderBoard(computerPlayer.gameboard);
+    computerBoard.appendChild(computerGrid);
     container.appendChild(computerBoard);
+
+    // Add status display
+    const status = document.createElement('div');
+    status.id = 'game-status';
+    status.className = 'game-status';
+    status.textContent = 'Real Player\'s turn';
+    container.appendChild(status);
 
     body.appendChild(container);
 
+    // Initialize game
+    Game.init(realPlayer, computerPlayer);
+
+    // Add event listeners to computer board cells
+    const computerCells = computerGrid.querySelectorAll('.board-cell');
+    computerCells.forEach(cell => {
+      cell.addEventListener('click', () => {
+        const x = parseInt(cell.dataset.x, 10);
+        const y = parseInt(cell.dataset.y, 10);
+
+        if (Game.getCurrentPlayer().isComputer()) {
+          status.textContent = 'Computer is attacking...';
+          return;
+        }
+
+        const result = Game.handleAttack([x, y]);
+
+        if (result.error) {
+          status.textContent = `Error: ${result.error}`;
+          return;
+        }
+
+        // Refresh both boards
+        updateBoardDisplay(realGrid, realPlayer.gameboard);
+        updateBoardDisplay(computerGrid, computerPlayer.gameboard);
+
+        if (result.gameOver) {
+          status.textContent = `Game Over! ${result.winner === realPlayer ? 'Real' : 'Computer'} Player Wins!`;
+        } else {
+          const currentPlayerType = Game.getCurrentPlayer() === realPlayer ? 'Real' : 'Computer';
+          status.textContent = `${currentPlayerType} Player's turn. Attack result: ${result.result}`;
+        }
+      });
+    });
+
     return { realPlayer, computerPlayer };
+  };
+
+  // Update board display after changes
+  const updateBoardDisplay = (gridElement, gameboard) => {
+    const cells = gridElement.querySelectorAll('.board-cell');
+    cells.forEach(cell => {
+      const x = parseInt(cell.dataset.x, 10);
+      const y = parseInt(cell.dataset.y, 10);
+
+      const key = x + ',' + y;
+      const isAttacked = gameboard.attacked.indexOf(key) !== -1;
+      const hasMissed = gameboard.missedAttacks.some(coord => coord[0] === x && coord[1] === y);
+
+      // Check if cell has a ship
+      let hasShip = false;
+      for (let i = 0; i < gameboard.ships.length; i += 1) {
+        const coords = gameboard.ships[i].coordinates;
+        for (let j = 0; j < coords.length; j += 1) {
+          if (coords[j][0] === x && coords[j][1] === y) {
+            hasShip = true;
+            break;
+          }
+        }
+        if (hasShip) break;
+      }
+
+      // Reset classes
+      cell.className = 'board-cell';
+      cell.textContent = '';
+
+      if (hasMissed) {
+        cell.classList.add('miss');
+        cell.textContent = '✗';
+      } else if (isAttacked && hasShip) {
+        cell.classList.add('hit');
+        cell.textContent = '●';
+      } else if (hasShip) {
+        cell.classList.add('ship');
+        cell.textContent = '■';
+      }
+    });
   };
 
   const placeShips = (player, shipPlacements) => {
